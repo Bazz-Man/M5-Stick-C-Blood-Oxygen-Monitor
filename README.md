@@ -1,2 +1,2 @@
 # Blood-Oxygen-Monitor
-Blood Oxygen Monitor based on M5 StickC ESP32
+M5 Stick C blood pulse and oximeter monitor using MAX30105 sensor
