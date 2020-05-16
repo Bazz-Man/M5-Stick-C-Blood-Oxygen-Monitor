@@ -7,7 +7,7 @@
 * -------------------------------------------------------------------------
 *
 * Version 0.1 - Based on MAX example updated by Molecular Descriptor (aromring) user
-* Version 0.2 - 
+* Version 0.2 -  
 */
 
 #include <M5StickC.h>
