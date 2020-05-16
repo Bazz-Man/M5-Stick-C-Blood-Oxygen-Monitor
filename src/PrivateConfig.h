@@ -1,3 +1,6 @@
+// Enter your own local values
+
+
 #define NETWORKNAME1 "network1"
 #define NETWORKPASS1 "network1 password"
 #define NETWORKNAME2 "network2"
