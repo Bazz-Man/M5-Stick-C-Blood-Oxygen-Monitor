@@ -5,11 +5,12 @@
 * ### NOTE ### INT pin on sensor connected to pin26 on M5StickC, Other pins are standard SCL/SDA I2C connection
 * -------------------------------------------------------------------------
 *
+* Credit to Fraczkiewicz, R. https://github.com/aromring/MAX30102_by_RF, accessed 10/30/2019 for the improved algorithm
+*
 * Version 0.1 - Based on MAX example updated by Molecular Descriptor (aromring) user
 * Version 0.2 - Removed unnecessary #ifdefs
 * Version 0.3 - add LCD display
 *******************************************************/
-
 
 #include <M5StickC.h>
 
@@ -18,20 +19,25 @@ const char* BuildDate = __DATE__;
 const char* Version = "V0.3";
 #define SKETCH "Blood Oxygen Monitor"
 #define HOSTNAME "M5StickC-1"
-#define STARTUPMSGDELAY 1500           // ms to wait to display startup messages
+#define STARTUPMSGDELAY 3000           // ms to wait to display startup messages
 #define SHORTVERSION false             // output just the version no on screen at startup
 #define STARTUPSCREENBRIGHTNESS 200    // startup brightness
-boolean M5stack = true;               //Enable M5 output text
+const char* M5TYPE = "M5StickC";       //Define M5 unit
 int StdScreenBrightness = 100;
-int BackGroundColor = BLUE;
-String BackGround = "RED";
+int BackGroundColor = BLACK;
+int TextColor = WHITE;
 char Build[30];
-#include "BuildInfo.h"              // Displays build info
+int SecondsToInvalid = 30;          // Number of seconds before we say values are invalid
+int LastValidTime = 0;              // Last time a valid reading was made 
+
+
+
 
 #include <algorithm_by_RF.h>        // more reliable than the MAX provided library - https://github.com/aromring/MAX30102_by_RF/blob/master/algorithm_by_RF.h
 #include "max30102.h"
-#include "PrivateConfig.h"            // needed for all network and security keys
-
+#include "PrivateConfig.h"          // needed for all network and security keys
+#include "BuildInfo.h"              // Displays build info
+#include "M5WifiSupport.h"          // Sets up Wifi and OTA support for M5 units
 
 //#define OUTPUTON // Uncomment for output to the Serial stream
 //#define DEBUG // Uncomment for debug output to the Serial stream
@@ -43,12 +49,6 @@ char Build[30];
   #include "algorithm.h" 
 #endif
 
-
-// #################
-// ### Variables ###############################################################################
-// #################
-
-
 const byte oxiInt = 26; // Interrupt pin connected to MAX30102 INT
 uint32_t elapsedTime,timeStart;
 uint32_t aun_ir_buffer[BUFFER_SIZE]; //infrared LED sensor data
@@ -57,32 +57,37 @@ float old_n_spo2;  // Previous SPO2 value
 uint8_t uch_dummy,k;
 
 // #################
-// ### Routines ################################################################################
+// ### Routines  ################################################################################
 // #################
 
 void M5DisplayHRSPO(String MSG , float Spo2, int32_t Hrate )
 {
+  
   if ( MSG == "Valid")
   {
-    M5.Lcd.fillScreen( BLUE );
-    M5.Lcd.setTextColor(BLACK);  
+    M5.Lcd.fillScreen( BackGroundColor );
+    M5.Lcd.setTextColor(TextColor);  
     M5.Lcd.setTextSize(3);
-    M5.Lcd.setCursor(10, 4);
+    M5.Lcd.setCursor(82, 4);
     M5.Lcd.print("Spo2");
-    M5.Lcd.setCursor(80, 4);
+    M5.Lcd.setTextSize(3);
+    M5.Lcd.setCursor(2, 4);
     M5.Lcd.print(Spo2);
+    M5.Lcd.setTextSize(3);
     M5.Lcd.setCursor(80, 44);
     M5.Lcd.print("BPM");
+    M5.Lcd.setTextSize(3);
     M5.Lcd.setCursor(40, 44);
     M5.Lcd.print(Hrate);
+    M5.Lcd.setCursor(2, 50);
+    M5.Lcd.print("H");
   }
   else
   {
-    M5.Lcd.fillScreen( YELLOW );
-    M5.Lcd.setTextColor(BLACK);  
-    M5.Lcd.setTextSize(3);
-    M5.Lcd.setCursor(2, 14);
-    M5.Lcd.print("SCANNING");
+    M5.Lcd.setTextColor(BackGroundColor);  
+    M5.Lcd.setTextColor(TextColor);  
+    M5.Lcd.setCursor(2, 50);
+    M5.Lcd.print("H");
   }
   
 }
@@ -111,15 +116,26 @@ void millis_to_hours(uint32_t ms, char* hr_str)
 // ################
 
 
-void setup() {
+void setup()
+{
+
+  if (M5TYPE)
+  {
+    M5.begin();
+  }
+  if ( M5TYPE == (char*)"M5StickC")
+  {
+    M5.Lcd.setRotation(3);
+  }
+
+  OutputBuildInfo();
+  
+  SetupMutiWifi();
+
+  SetupOTAFunctions();
 
   Wire.begin(32,33);
   
-  M5.begin();
-  M5.Lcd.setRotation(3);
-  
-  OutputBuildInfo();
-
   pinMode(oxiInt, INPUT);  //pin D10 connects to the interrupt output pin of the MAX30102
 
   maxim_max30102_reset(); //resets the MAX30102
@@ -158,6 +174,11 @@ void loop()
   int8_t  ch_hr_valid;  //indicator to show if the heart rate calculation is valid
   int32_t i;
   char hr_str[10];
+
+  // Start of OTA check section
+  ArduinoOTA.handle();
+  yield();
+  // End of OTA check section
      
   //buffer length of BUFFER_SIZE stores ST seconds of samples running at FS sps
   //read BUFFER_SIZE samples, and determine the signal range
@@ -220,7 +241,6 @@ void loop()
   if(ch_hr_valid && ch_spo2_valid)
   { 
 #endif // TEST_MAXIM_ALGORITHM
-
     Serial.print(elapsedTime);
     Serial.print("\t");
     Serial.print(n_spo2);
@@ -240,13 +260,16 @@ void loop()
     Serial.println(correl);
     Serial.print("");
     old_n_spo2=n_spo2;
-    //M5DisplayHRSPO("Valid",n_spo2 , n_heart_rate);
 
+    LastValidTime = millis();         // reset last valid reading time
+    M5DisplayHRSPO("Valid",n_spo2 , n_heart_rate);
   }
   else
   {
     Serial.printf("Heart Rate Valid = %i Oxygen Valid = %i\n", ch_hr_valid , ch_spo2_valid );
-    //M5DisplayHRSPO("Scanning",n_spo2 , n_heart_rate);
+    M5DisplayHRSPO("INValid",n_spo2 , n_heart_rate);
   }
+
+  
 
 }

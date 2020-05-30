@@ -48,13 +48,13 @@
 // The sum is symmetrc, so you can evaluate it by multiplying its positive half by 2. It is precalcuated here for enhanced 
 // performance.
 const float sum_X2 = 83325; // WARNING: you MUST recalculate this sum if you changed either ST or FS above!
-#define MAX_HR 125  // Maximal heart rate. To eliminate erroneous signals, calculated HR should never be greater than this number.
+#define MAX_HR 150  // Maximal heart rate. To eliminate erroneous signals, calculated HR should never be greater than this number.
 #define MIN_HR 40   // Minimal heart rate. To eliminate erroneous signals, calculated HR should never be lower than this number.
 // Typical heart rate. Set it to the upper value of the expected heart rate range in a given application. Obviously, it must be 
 // in between MIN_HR and MAX_HR. For example, if HR in an overnight measurement varies between 46 and 65, but 90% of the time 
 // stays between 50 and 60, then set it to 60.
 // WARNING: This is a CRUCIAL parameter! Proper HR evaluation depends on it.
-#define TYPICAL_HR 60
+#define TYPICAL_HR 65
 // Minimal ratio of two autocorrelation sequence elements: one at a considered lag to the one at lag 0.
 // Good quality signals must have such ratio greater than this minimum.
 const float min_autocorrelation_ratio = 0.5;
