@@ -35,7 +35,7 @@ int LastValidTime = 0;              // Last time a valid reading was made
 
 #include <algorithm_by_RF.h>        // more reliable than the MAX provided library - https://github.com/aromring/MAX30102_by_RF/blob/master/algorithm_by_RF.h
 #include "max30102.h"
-#include "PrivateConfig.h"          // needed for all network and security keys
+#include "Credentials.h"          // needed for all network and security keys
 #include "BuildInfo.h"              // Displays build info
 #include "M5WifiSupport.h"          // Sets up Wifi and OTA support for M5 units
 
