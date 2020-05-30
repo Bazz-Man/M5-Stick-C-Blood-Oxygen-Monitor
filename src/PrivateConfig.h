@@ -9,6 +9,8 @@
 #define NETWORKNAME4 "network4"
 #define NETWORKPASS4 "network4 password"
 
+#define OTAPort 3232
+
 /** START - MQTT parameters **/
 char* MQTTOutputTopic = "Monitor/OUT";
 char* MQTTOutputDiag = "Monitor/DIAG";
