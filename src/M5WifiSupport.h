@@ -1,13 +1,59 @@
 #include <WiFiMulti.h>                //Support for defining multiple WiFi points (used at startup)
 #include <ArduinoOTA.h>               //Over The Air updates
 #include "XBMImages.h"                // needed for AlertImage xbm image
+#include <ezTime.h>                   // Time support
 
 String WiFiIP;
 String WiFiSID;
 WiFiMulti wifiMulti;
 
+void SetupNTTPTime()
+{
+  BackGroundColor = TFT_BLUE;
+  Serial.println("Getting Time from Network");
+
+  if ( M5TYPE == (char*)"M5CORE")
+  {
+
+  }
+  if ( M5TYPE == (char*)"M5StickC")
+  {
+    M5.Lcd.fillScreen(BackGroundColor);
+    M5.Lcd.setCursor(4,2);
+    M5.Lcd.setTextSize(2);
+    M5.Lcd.setTextColor(WHITE, BackGroundColor);
+    M5.Lcd.println("Getting Time from Network");
+  } 
+
+  waitForSync(10);
+  Serial.println("UTC: " + UTC.dateTime());
+ 	Timezone UK;
+	UK.setLocation("Europe/London");
+	Serial.println("UK: " + UK.dateTime());
+  Serial.println(UK.dateTime("D j~-m~-y g:i a"));
+
+  if ( M5TYPE == (char*)"M5CORE")
+  {
+
+
+  }
+  if ( M5TYPE == (char*)"M5StickC")
+  {
+    M5.Lcd.fillScreen(BackGroundColor);
+    M5.Lcd.setCursor(4,2);
+    M5.Lcd.setTextSize(3);
+    M5.Lcd.setTextColor(WHITE, BackGroundColor);
+    M5.Lcd.println(UK.dateTime("j~-m~-y"));
+    M5.Lcd.setCursor(8,26);
+    M5.Lcd.println(UK.dateTime("g:i a"));
+  } 
+
+  delay(STARTUPMSGDELAY);
+}
+
 void ConnectWiFi(int Count)   // if count is zero then it will loop forever
 {
+  BackGroundColor = TFT_BLUE;
   while (wifiMulti.run() != WL_CONNECTED)
   {
     delay(500);
@@ -63,6 +109,7 @@ void ConnectWiFi(int Count)   // if count is zero then it will loop forever
 
 void SetupMutiWifi()
 {
+  BackGroundColor = TFT_BLUE;
   Serial.println("Starting wifi");
   if (M5TYPE == (char*)"M5CORE")
   {
@@ -120,11 +167,17 @@ void SetupMutiWifi()
   } 
 
   delay(STARTUPMSGDELAY);
+
+  //Now get the time
+  SetupNTTPTime();
+
 }
+
 
 /** START - OAT Code **/
 void SetupOTAFunctions()
 {  
+  BackGroundColor = TFT_BLUE;
   // Start of OTA section
 
   Serial.println("OTA Setup Starting");
@@ -257,7 +310,10 @@ void SetupOTAFunctions()
       M5.Lcd.setCursor(0,4);
       M5.Lcd.setTextSize(2);
       M5.Lcd.setTextColor(WHITE, BackGroundColor);
-      M5.Lcd.println("OTA update FAILED");
+      M5.Lcd.println("OTA update");
+      M5.Lcd.setCursor(4,24);
+      M5.Lcd.setTextSize(3);
+      M5.Lcd.println("FAILED");
     }
     
     delay(STARTUPMSGDELAY);
@@ -267,6 +323,9 @@ void SetupOTAFunctions()
     else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
     else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
     else if (error == OTA_END_ERROR)     Serial.println("End Failed");
+    
+    delay(STARTUPMSGDELAY);
+    ESP.restart();
   });
   
   ArduinoOTA.begin();
@@ -291,7 +350,7 @@ void SetupOTAFunctions()
     M5.Lcd.setCursor(0,4);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
-    M5.Lcd.println("OTA Ready");
+    M5.Lcd.println("OTA UP");
     M5.Lcd.println("Check Update");
   }
 
@@ -354,18 +413,17 @@ void SetupOTAFunctions()
   }
   if (M5TYPE == (char*)"M5StickC")
   {
-    BackGroundColor = TFT_BLUE;
+    BackGroundColor = TFT_GREEN;
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(0,4);
     M5.Lcd.setTextSize(2);
-    M5.Lcd.setTextColor(WHITE, BackGroundColor);
+    M5.Lcd.setTextColor(TFT_BLACK, BackGroundColor);
     M5.Lcd.println("OTA Ready");
   }
 
   delay(STARTUPMSGDELAY);    // delay so that no issues with ezM5 library occurs
-  BackGroundColor = TFT_BLACK;
-  M5.Lcd.fillScreen(BackGroundColor);
-
+  
+  M5.Lcd.fillScreen(TFT_BLACK);   //Clear the screen
 
 }
 /** END - OAT Code **/

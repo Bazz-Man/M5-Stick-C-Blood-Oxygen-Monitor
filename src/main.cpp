@@ -1,4 +1,4 @@
-/*******************************************************
+/**********************************************************************************************************************
 * 
 * Updated to work on M5StickC - B.Chubb 10th May 2020
 * Checked/works with pimironi MAX30105 sensor
@@ -10,13 +10,14 @@
 * Version 0.1 - Based on MAX example updated by Molecular Descriptor (aromring) user
 * Version 0.2 - Removed unnecessary #ifdefs
 * Version 0.3 - add LCD display
-*******************************************************/
+* Version 0.4 - add credentials.h file, add wifi, OTA and time support
+**********************************************************************************************************************/
 
 #include <M5StickC.h>
 
 const char* BuildTime = __TIME__;
 const char* BuildDate = __DATE__;
-const char* Version = "V0.3";
+const char* Version = "V0.4";
 #define SKETCH "Blood Oxygen Monitor"
 #define HOSTNAME "M5StickC-1"
 #define STARTUPMSGDELAY 3000           // ms to wait to display startup messages
@@ -38,6 +39,8 @@ int LastValidTime = 0;              // Last time a valid reading was made
 #include "Credentials.h"          // needed for all network and security keys
 #include "BuildInfo.h"              // Displays build info
 #include "M5WifiSupport.h"          // Sets up Wifi and OTA support for M5 units
+
+
 
 //#define OUTPUTON // Uncomment for output to the Serial stream
 //#define DEBUG // Uncomment for debug output to the Serial stream

@@ -1,5 +1,6 @@
 void M5OutputBuildInfo()
 {
+  BackGroundColor = TFT_DARKGREEN;
   if ( M5TYPE == (char*)"M5StickC" )
   {
     //M5.Lcd.setBrightness(StdScreenBrightness);
