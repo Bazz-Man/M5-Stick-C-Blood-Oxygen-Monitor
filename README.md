@@ -14,4 +14,5 @@ M5 Stick C blood pulse and oximeter monitor using MAX30105 sensor
 * Version 0.2 - Removed unnecessary #ifdefs
 * Version 0.3 - add LCD display
 * Version 0.4 - add credentials.h file, add wifi, OTA and time support
+* Version 0.5 - display shows period from last valid reading, updated formatting
 **********************************************************************************************************************/

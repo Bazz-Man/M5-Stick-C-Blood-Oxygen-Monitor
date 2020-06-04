@@ -11,6 +11,7 @@
 * Version 0.2 - Removed unnecessary #ifdefs
 * Version 0.3 - add LCD display
 * Version 0.4 - add credentials.h file, add wifi, OTA and time support
+* Version 0.5 - display shows period from last valid reading, updated formatting
 **********************************************************************************************************************/
 
 #include <M5StickC.h>
@@ -29,7 +30,8 @@ int BackGroundColor = BLACK;
 int TextColor = WHITE;
 char Build[30];
 int SecondsToInvalid = 30;          // Number of seconds before we say values are invalid
-int LastValidTime = 0;              // Last time a valid reading was made 
+time_t LastValidTime;              // Last time a valid reading was made 
+
 
 
 
@@ -65,32 +67,36 @@ uint8_t uch_dummy,k;
 
 void M5DisplayHRSPO(String MSG , float Spo2, int32_t Hrate )
 {
-  
+  BackGroundColor = TFT_BLACK;
+  TextColor = TFT_WHITE;
   if ( MSG == "Valid")
   {
     M5.Lcd.fillScreen( BackGroundColor );
     M5.Lcd.setTextColor(TextColor);  
-    M5.Lcd.setTextSize(3);
-    M5.Lcd.setCursor(82, 4);
+    M5.Lcd.setTextSize(2);
+    M5.Lcd.setCursor(102, 10);
     M5.Lcd.print("Spo2");
     M5.Lcd.setTextSize(3);
-    M5.Lcd.setCursor(2, 4);
-    M5.Lcd.print(Spo2);
-    M5.Lcd.setTextSize(3);
-    M5.Lcd.setCursor(80, 44);
+    M5.Lcd.setCursor(23, 4);
+    M5.Lcd.printf("%4.1f",Spo2);
+    //M5.Lcd.print(Spo2);
+    M5.Lcd.setTextSize(2);
+    M5.Lcd.setCursor(102, 44);
     M5.Lcd.print("BPM");
     M5.Lcd.setTextSize(3);
-    M5.Lcd.setCursor(40, 44);
+    M5.Lcd.setCursor(60, 38);
     M5.Lcd.print(Hrate);
-    M5.Lcd.setCursor(2, 50);
-    M5.Lcd.print("H");
+    M5.Lcd.setCursor(2, 60);
+    M5.Lcd.print("*");
   }
   else
   {
+    BackGroundColor = TFT_BLACK;
+    TextColor = TFT_BLACK;
     M5.Lcd.setTextColor(BackGroundColor);  
     M5.Lcd.setTextColor(TextColor);  
-    M5.Lcd.setCursor(2, 50);
-    M5.Lcd.print("H");
+    M5.Lcd.setCursor(2, 60);
+    M5.Lcd.print("*");
   }
   
 }
@@ -244,10 +250,9 @@ void loop()
   if(ch_hr_valid && ch_spo2_valid)
   { 
 #endif // TEST_MAXIM_ALGORITHM
-    Serial.print(elapsedTime);
+    Serial.print(UK.dateTime("g:i:s a"));
     Serial.print("\t");
-    Serial.print(n_spo2);
-    Serial.print("\t");
+    Serial.printf("%4.1f\t",n_spo2);
     Serial.print(n_heart_rate, DEC);
     Serial.print("\t");
   #ifdef TEST_MAXIM_ALGORITHM
@@ -264,12 +269,26 @@ void loop()
     Serial.print("");
     old_n_spo2=n_spo2;
 
-    LastValidTime = millis();         // reset last valid reading time
+    LastValidTime = UK.now();         // reset last valid reading time
     M5DisplayHRSPO("Valid",n_spo2 , n_heart_rate);
   }
   else
   {
-    Serial.printf("Heart Rate Valid = %i Oxygen Valid = %i\n", ch_hr_valid , ch_spo2_valid );
+    if (timeStatus() == timeSet)
+    {
+      Serial.print("Now:" + UK.dateTime("g:i:s a"));
+      String StrLastValidTime = "DummyTxt";
+      Serial.printf("\tLast Valid Reading: %s\n",StrLastValidTime);
+
+    }
+    else
+    {    
+      Serial.print("TIMENOTSET");
+      updateNTP();
+    }
+    
+    //Serial.print("\t");
+    //Serial.printf("Heart Rate Valid = %i Oxygen Valid = %i\n", ch_hr_valid , ch_spo2_valid );
     M5DisplayHRSPO("INValid",n_spo2 , n_heart_rate);
   }
 

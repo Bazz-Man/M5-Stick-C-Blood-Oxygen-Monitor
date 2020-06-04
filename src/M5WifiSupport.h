@@ -7,10 +7,16 @@ String WiFiIP;
 String WiFiSID;
 WiFiMulti wifiMulti;
 
+Timezone UK;
+
+
 void SetupNTTPTime()
 {
+  setDebug(ERROR);
+  UK.setLocation("Europe/London");
+  UK.setDefault();
   BackGroundColor = TFT_BLUE;
-  Serial.println("Getting Time from Network");
+  Serial.println("Retrieving Time from Network");
 
   if ( M5TYPE == (char*)"M5CORE")
   {
@@ -22,13 +28,12 @@ void SetupNTTPTime()
     M5.Lcd.setCursor(4,2);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
-    M5.Lcd.println("Getting Time from Network");
+    M5.Lcd.println("Retrieving Time");
   } 
 
-  waitForSync(10);
+  waitForSync(5);
   Serial.println("UTC: " + UTC.dateTime());
- 	Timezone UK;
-	UK.setLocation("Europe/London");
+
 	Serial.println("UK: " + UK.dateTime());
   Serial.println(UK.dateTime("D j~-m~-y g:i a"));
 
