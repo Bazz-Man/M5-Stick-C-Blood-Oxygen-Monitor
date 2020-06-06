@@ -278,7 +278,7 @@ void loop()
     if (timeStatus() == timeSet)
     {
       Serial.print("Now:" + UK.dateTime("g:i:s a"));
-      String StrLastValidTime = "DummyTxt";
+      char StrLastValidTime[40] = "DummyTxt";
       Serial.printf("\tLast Valid Reading: %s\n",StrLastValidTime);
 
     }
