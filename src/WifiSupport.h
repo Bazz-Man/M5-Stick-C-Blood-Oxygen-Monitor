@@ -1,6 +1,8 @@
 #include <WiFiMulti.h>                //Support for defining multiple WiFi points (used at startup)
 #include <ArduinoOTA.h>               //Over The Air updates
-#include "XBMImages.h"                // needed for AlertImage xbm image
+#ifdef M5CORE
+  #include "XBMImages.h"                // needed for AlertImage xbm image
+#endif
 #include <ezTime.h>                   // Time support
 
 String WiFiIP;
@@ -18,18 +20,13 @@ void SetupNTTPTime()
   BackGroundColor = TFT_BLUE;
   Serial.println("Retrieving Time from Network");
 
-  if ( M5TYPE == (char*)"M5CORE")
-  {
-
-  }
-  if ( M5TYPE == (char*)"M5StickC")
-  {
+#ifdef M5StickC
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(4,2);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
     M5.Lcd.println("Retrieving Time");
-  } 
+#endif 
 
   waitForSync(5);
   Serial.println("UTC: " + UTC.dateTime());
@@ -37,13 +34,7 @@ void SetupNTTPTime()
 	Serial.println("UK: " + UK.dateTime());
   Serial.println(UK.dateTime("D j~-m~-y g:i a"));
 
-  if ( M5TYPE == (char*)"M5CORE")
-  {
-
-
-  }
-  if ( M5TYPE == (char*)"M5StickC")
-  {
+#ifdef M5StickC
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(4,2);
     M5.Lcd.setTextSize(3);
@@ -51,7 +42,7 @@ void SetupNTTPTime()
     M5.Lcd.println(UK.dateTime("j~-m~-y"));
     M5.Lcd.setCursor(8,26);
     M5.Lcd.println(UK.dateTime("g:i a"));
-  } 
+#endif
 
   delay(STARTUPMSGDELAY);
 }
@@ -64,74 +55,67 @@ void ConnectWiFi(int Count)   // if count is zero then it will loop forever
     delay(500);
     Serial.print(Count);
     Serial.print(" - ");
-    if ( M5TYPE == (char*)"M5CORE")
-    {
+#ifdef M5CORE
       M5.Lcd.drawXBitmap(280,0, WiFiErr, WiFiErrWidth, WiFiErrHeight, TFT_RED);
       M5.Lcd.setCursor(160,100);
       M5.Lcd.setTextSize(4);
       M5.Lcd.setTextColor(WHITE, BackGroundColor);
       M5.Lcd.println(Count);
+#endif
 
-    }
-    if ( M5TYPE == (char*)"M5StickC")
-    {
+#ifdef M5StickC
       M5.Lcd.fillScreen(BackGroundColor);
       M5.Lcd.setCursor(0,4);
       M5.Lcd.setTextSize(2);
       M5.Lcd.setTextColor(WHITE, BackGroundColor);
       M5.Lcd.println(Count);
-    } 
+#endif
     Count--;
     if ( Count == 0)  // its taken to long to connect so cycle the unit
     {
       Serial.println("Connection Failed - Rebooting");
       
-      if ( M5TYPE == (char*)"M5CORE" )
-      {
+#ifdef M5CORE
         M5.Lcd.fillScreen(BackGroundColor);
         M5.Lcd.setCursor(0,20);
         M5.Lcd.setTextSize(4);
         M5.Lcd.setTextColor(WHITE, BackGroundColor);
         M5.Lcd.println("WIFI Connection Failed - Rebooting");
         delay(1000);
-      }
-      if ( M5TYPE == (char*)"M5StickC")
-      {
+#endif
+#ifdef M5StickC
         M5.Lcd.fillScreen(BackGroundColor);
         M5.Lcd.setCursor(0,4);
         M5.Lcd.setTextSize(1);
         M5.Lcd.setTextColor(WHITE, BackGroundColor);
         M5.Lcd.println("WIFI Connection Failed - Rebooting");
-      } 
+#endif
       ESP.restart();
     }
   }
-  if ( M5TYPE == (char*)"M5CORE")
-  {
+#ifdef M5CORE
   M5.Lcd.drawXBitmap(280,195, WiFiErr, WiFiErrWidth, WiFiErrHeight, TFT_BLACK);
-  }
+#endif
 }
 
 void SetupMutiWifi()
 {
   BackGroundColor = TFT_BLUE;
   Serial.println("Starting wifi");
-  if (M5TYPE == (char*)"M5CORE")
-  {
+#ifdef M5CORE
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(0,50);
     M5.Lcd.setTextSize(4);
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
     M5.Lcd.println("Starting wifi");
-  }
-  if ( M5TYPE == (char*)"M5StickC")
-  {
+#endif
+#ifdef M5StickC
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(0,4);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
     M5.Lcd.println("Starting wifi");
-  } 
+#endif
 
   WiFi.setHostname(HOSTNAME);
   wifiMulti.addAP(NETWORKNAME1, NETWORKPASS1);
@@ -148,8 +132,7 @@ void SetupMutiWifi()
   WiFiSID = WiFi.SSID();
   Serial.println(WiFiSID);
   Serial.println(WiFiIP);
-  if (M5TYPE == (char*)"M5CORE")
-  {
+#ifdef M5CORE
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(5,20);
     M5.Lcd.setTextSize(4);
@@ -158,9 +141,8 @@ void SetupMutiWifi()
     M5.Lcd.setCursor(5,50);
     M5.Lcd.setTextSize(3);
     M5.Lcd.println(WiFiIP);   
-  }
-  if ( M5TYPE == (char*)"M5StickC")
-  {
+#endif
+#ifdef M5StickC
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(0,4);
     M5.Lcd.setTextSize(2);
@@ -169,7 +151,7 @@ void SetupMutiWifi()
     M5.Lcd.setCursor(0,24);
     M5.Lcd.setTextSize(2);
     M5.Lcd.println(WiFiIP);  
-  } 
+#endif
 
   delay(STARTUPMSGDELAY);
 
@@ -186,24 +168,22 @@ void SetupOTAFunctions()
   // Start of OTA section
 
   Serial.println("OTA Setup Starting");
-  if (M5TYPE == (char*)"M5CORE")
-  {
+#ifdef M5CORE
     BackGroundColor = TFT_BLACK;
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(20,20);
     M5.Lcd.setTextSize(3);
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
     M5.Lcd.println("OTA Initialising");
-  }
-  if (M5TYPE == (char*)"M5StickC")
-  {
+#endif
+#ifdef M5StickC
     BackGroundColor = TFT_BLACK;
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(0,4);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
     M5.Lcd.println("OTA Initialising");
-  }
+#endif
 
     
   ArduinoOTA.setPort(OTAPort);
@@ -225,24 +205,22 @@ void SetupOTAFunctions()
       type = "filesystem";
     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
     Serial.println("Start updating " + type);
-    if (M5TYPE == (char*)"M5CORE")
-    {
+#ifdef M5CORE
       BackGroundColor = TFT_BLACK;
       M5.Lcd.fillScreen(BackGroundColor);
       M5.Lcd.setCursor(50,40);
       M5.Lcd.setTextSize(3);
       M5.Lcd.setTextColor(WHITE, BackGroundColor);
       M5.Lcd.println("OTA updating");
-    }
-    if (M5TYPE == (char*)"M5StickC")
-    {
+#endif
+#ifdef M5StickC
       BackGroundColor = TFT_BLACK;
       M5.Lcd.fillScreen(BackGroundColor);
       M5.Lcd.setCursor(0,4);
       M5.Lcd.setTextSize(2);
       M5.Lcd.setTextColor(WHITE, BackGroundColor);
       M5.Lcd.println("OTA updating");
-    }
+#endif
     //sprintf(MQTTMsg, "%s: OTA update starting", HOSTNAME);  // Construct MQTT message
     delay(100);
   });
@@ -250,48 +228,44 @@ void SetupOTAFunctions()
   {
     int DProgress = round((progress / (total / 100)));
     Serial.printf("%i%%\n", DProgress);
-    if (M5TYPE == (char*)"M5CORE")
-    {
+#ifdef M5CORE
       BackGroundColor = TFT_BLACK;
       M5.Lcd.setCursor(120,100);
       M5.Lcd.setTextSize(6);
       M5.Lcd.setTextColor(WHITE, BackGroundColor);
       M5.Lcd.print(DProgress);
       M5.Lcd.print("%");
-    }
-    if (M5TYPE == (char*)"M5StickC")
-    {
+#endif
+#ifdef M5StickC
       BackGroundColor = TFT_BLACK;
       M5.Lcd.setCursor(50,30);
       M5.Lcd.setTextSize(2);
       M5.Lcd.setTextColor(WHITE, BackGroundColor);
       M5.Lcd.print(DProgress);
       M5.Lcd.print("%");
-    }
+#endif
   });
   ArduinoOTA.onEnd([]()
   {
     Serial.println("\nOTA Download Completed");
     //sprintf(MQTTMsg, "%s: OTA update completed successfully", HOSTNAME);  // Construct MQTT message
     //client.publish(StatusTopic, MQTTMsg);
-    if (M5TYPE == (char*)"M5CORE")
-    {
+#ifdef M5CORE
       BackGroundColor = TFT_GREEN;
       M5.Lcd.fillScreen(BackGroundColor);
       M5.Lcd.setCursor(0,20);
       M5.Lcd.setTextSize(3);
       M5.Lcd.setTextColor(BLACK, BackGroundColor);
       M5.Lcd.println("OTA Download Completed");
-    }
-    if (M5TYPE == (char*)"M5StickC")
-    {
+#endif
+#ifdef M5StickC
       BackGroundColor = TFT_GREEN;
       M5.Lcd.fillScreen(BackGroundColor);
       M5.Lcd.setCursor(0,4);
       M5.Lcd.setTextSize(2);
       M5.Lcd.setTextColor(BLACK, BackGroundColor);
       M5.Lcd.println("OTA Download Completed");
-    }
+#endif
     delay(STARTUPMSGDELAY);
   });
   ArduinoOTA.onError([](ota_error_t error)
@@ -299,17 +273,15 @@ void SetupOTAFunctions()
     Serial.printf("Error[%u]: ", error);
     //sprintf(MQTTMsg, "%s: OTA update FAILED", HOSTNAME);  // Construct MQTT message
     //client.publish(StatusTopic, MQTTMsg);
-    if (M5TYPE == (char*)"M5CORE")
-    {
+#ifdef M5CORE
       BackGroundColor = TFT_RED;
       M5.Lcd.fillScreen(BackGroundColor);
       M5.Lcd.setCursor(0,20);
       M5.Lcd.setTextSize(3);
       M5.Lcd.setTextColor(WHITE, BackGroundColor);
       M5.Lcd.println("OTA update FAILED");
-    }
-    if (M5TYPE == (char*)"M5StickC")
-    {
+#endif
+#ifdef M5StickC
       BackGroundColor = TFT_RED;
       M5.Lcd.fillScreen(BackGroundColor);
       M5.Lcd.setCursor(0,4);
@@ -319,7 +291,7 @@ void SetupOTAFunctions()
       M5.Lcd.setCursor(4,24);
       M5.Lcd.setTextSize(3);
       M5.Lcd.println("FAILED");
-    }
+#endif
     
     delay(STARTUPMSGDELAY);
 
@@ -338,8 +310,7 @@ void SetupOTAFunctions()
   Serial.println("OTA System Ready");
   Serial.println("Checking for OTA Update");
 
-  if (M5TYPE == (char*)"M5CORE")
-  {
+#ifdef M5CORE
     BackGroundColor = TFT_BLUE;
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(0,20);
@@ -347,9 +318,8 @@ void SetupOTAFunctions()
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
     M5.Lcd.println("OTA System Ready");
     M5.Lcd.println("Checking for OTA Update");
-  }
-  if (M5TYPE == (char*)"M5StickC")
-  {
+#endif
+#ifdef M5StickC
     BackGroundColor = TFT_BLUE;
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(0,4);
@@ -357,45 +327,41 @@ void SetupOTAFunctions()
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
     M5.Lcd.println("OTA UP");
     M5.Lcd.println("Check Update");
-  }
+#endif
 
   for (int i = 2; i < 13; i++)
   {
     if (i % 2) {  // if progess is even then turn on blue pixel, if odd then turn it off
       Serial.println("CHECK FOR OTA");
-      if (M5TYPE == (char*)"M5CORE")
-      {
+#ifdef M5CORE
         M5.Lcd.setCursor(10,60);
         M5.Lcd.setTextSize(3);
         M5.Lcd.setTextColor(WHITE, BackGroundColor);
         M5.Lcd.println("XXXX");
-      }
-      if (M5TYPE == (char*)"M5StickC")
-      {
+#endif
+#ifdef M5StickC
         M5.Lcd.setCursor(4,40);
         M5.Lcd.setTextSize(2);
         M5.Lcd.setTextColor(WHITE, BackGroundColor);
         M5.Lcd.println("XXXX");
-      }
+#endif
 
     }
     else
     {
       Serial.println("|||||||||||||");
-      if (M5TYPE == (char*)"M5CORE")
-      {
+#ifdef M5CORE
         M5.Lcd.setCursor(10,60);
         M5.Lcd.setTextSize(3);
         M5.Lcd.setTextColor(WHITE, BackGroundColor);
         M5.Lcd.println("----");
-      }
-      if (M5TYPE == (char*)"M5StickC")
-      {
+#endif
+#ifdef M5StickC
         M5.Lcd.setCursor(4,40);
         M5.Lcd.setTextSize(2);
         M5.Lcd.setTextColor(WHITE, BackGroundColor);
         M5.Lcd.println("----");
-      }
+#endif
     }
 
     // Start of OTA check section
@@ -406,8 +372,7 @@ void SetupOTAFunctions()
   }
   
   Serial.println("OTA Setup Completed");
-  if (M5TYPE == (char*)"M5CORE")
-  {
+#ifdef M5CORE
     BackGroundColor = TFT_BLUE;
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(0,20);
@@ -415,16 +380,15 @@ void SetupOTAFunctions()
     M5.Lcd.setTextColor(WHITE, BackGroundColor);
     M5.Lcd.println("OTA System Ready");
     M5.Lcd.println("OTA Setup Completed");
-  }
-  if (M5TYPE == (char*)"M5StickC")
-  {
+#endif
+#ifdef M5StickC
     BackGroundColor = TFT_GREEN;
     M5.Lcd.fillScreen(BackGroundColor);
     M5.Lcd.setCursor(0,4);
     M5.Lcd.setTextSize(2);
     M5.Lcd.setTextColor(TFT_BLACK, BackGroundColor);
     M5.Lcd.println("OTA Ready");
-  }
+#endif
 
   delay(STARTUPMSGDELAY);    // delay so that no issues with ezM5 library occurs
   

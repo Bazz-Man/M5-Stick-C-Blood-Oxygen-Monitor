@@ -12,19 +12,22 @@
 * Version 0.3 - add LCD display
 * Version 0.4 - add credentials.h file, add wifi, OTA and time support
 * Version 0.5 - display shows period from last valid reading, updated formatting
+* Vesrion 0.6 - change Wifi.h and buildinfo.h to support ifdef statements for different M5 units
 **********************************************************************************************************************/
 
 #include <M5StickC.h>
 
 const char* BuildTime = __TIME__;
 const char* BuildDate = __DATE__;
-const char* Version = "V0.4";
+const char* Version = "V0.6";
 #define SKETCH "Blood Oxygen Monitor"
 #define HOSTNAME "M5StickC-1"
 #define STARTUPMSGDELAY 3000           // ms to wait to display startup messages
 #define SHORTVERSION false             // output just the version no on screen at startup
 #define STARTUPSCREENBRIGHTNESS 200    // startup brightness
-const char* M5TYPE = "M5StickC";       //Define M5 unit
+#define M5StickC                       // define M5 type so WifiSupport.h knows how to display LCD messages
+//#define M5CORE                        // define M5 type so WifiSupport.h knows how to display LCD messages
+//const char* M5TYPE = "M5StickC";       //Define M5 unit
 int StdScreenBrightness = 100;
 int BackGroundColor = BLACK;
 int TextColor = WHITE;
@@ -40,7 +43,7 @@ time_t LastValidTime;              // Last time a valid reading was made
 #include "max30102.h"
 #include "Credentials.h"          // needed for all network and security keys
 #include "BuildInfo.h"              // Displays build info
-#include "M5WifiSupport.h"          // Sets up Wifi and OTA support for M5 units
+#include "WifiSupport.h"          // Sets up Wifi and OTA support for M5 units
 
 
 
@@ -128,14 +131,12 @@ void millis_to_hours(uint32_t ms, char* hr_str)
 void setup()
 {
 
-  if (M5TYPE)
-  {
-    M5.begin();
-  }
-  if ( M5TYPE == (char*)"M5StickC")
-  {
-    M5.Lcd.setRotation(3);
-  }
+#if defined M5CORE || defined M5StickC
+  M5.begin();
+#endif
+#ifdef M5StickC
+  M5.Lcd.setRotation(3);
+#endif
 
   OutputBuildInfo();
   
