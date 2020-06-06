@@ -17,15 +17,15 @@ void SetupNTTPTime()
   setDebug(ERROR);
   UK.setLocation("Europe/London");
   UK.setDefault();
+  BackGroundColor = TFT_BLUE;
   Serial.println("Retrieving Time from Network");
 
 #ifdef M5StickC
-  BackGroundColor = TFT_BLUE;
-  M5.Lcd.fillScreen(BackGroundColor);
-  M5.Lcd.setCursor(4,2);
-  M5.Lcd.setTextSize(2);
-  M5.Lcd.setTextColor(WHITE, BackGroundColor);
-  M5.Lcd.println("Retrieving Time");
+    M5.Lcd.fillScreen(BackGroundColor);
+    M5.Lcd.setCursor(4,2);
+    M5.Lcd.setTextSize(2);
+    M5.Lcd.setTextColor(WHITE, BackGroundColor);
+    M5.Lcd.println("Retrieving Time");
 #endif 
 
   waitForSync(5);
@@ -49,19 +49,18 @@ void SetupNTTPTime()
 
 void ConnectWiFi(int Count)   // if count is zero then it will loop forever
 {
-
+  BackGroundColor = TFT_BLUE;
   while (wifiMulti.run() != WL_CONNECTED)
   {
     delay(500);
     Serial.print(Count);
     Serial.print(" - ");
 #ifdef M5CORE
-    BackGroundColor = TFT_BLUE;
-    M5.Lcd.drawXBitmap(280,0, WiFiErr, WiFiErrWidth, WiFiErrHeight, TFT_RED);
-    M5.Lcd.setCursor(160,100);
-    M5.Lcd.setTextSize(4);
-    M5.Lcd.setTextColor(WHITE, BackGroundColor);
-    M5.Lcd.println(Count);
+      M5.Lcd.drawXBitmap(280,0, WiFiErr, WiFiErrWidth, WiFiErrHeight, TFT_RED);
+      M5.Lcd.setCursor(160,100);
+      M5.Lcd.setTextSize(4);
+      M5.Lcd.setTextColor(WHITE, BackGroundColor);
+      M5.Lcd.println(Count);
 #endif
 
 #ifdef M5StickC
@@ -101,23 +100,21 @@ void ConnectWiFi(int Count)   // if count is zero then it will loop forever
 
 void SetupMutiWifi()
 {
-
+  BackGroundColor = TFT_BLUE;
   Serial.println("Starting wifi");
 #ifdef M5CORE
-  BackGroundColor = TFT_BLUE;
-  M5.Lcd.fillScreen(BackGroundColor);
-  M5.Lcd.setCursor(0,50);
-  M5.Lcd.setTextSize(4);
-  M5.Lcd.setTextColor(WHITE, BackGroundColor);
-  M5.Lcd.println("Starting wifi");
+    M5.Lcd.fillScreen(BackGroundColor);
+    M5.Lcd.setCursor(0,50);
+    M5.Lcd.setTextSize(4);
+    M5.Lcd.setTextColor(WHITE, BackGroundColor);
+    M5.Lcd.println("Starting wifi");
 #endif
 #ifdef M5StickC
-  BackGroundColor = TFT_BLUE;
-  M5.Lcd.fillScreen(BackGroundColor);
-  M5.Lcd.setCursor(0,4);
-  M5.Lcd.setTextSize(2);
-  M5.Lcd.setTextColor(WHITE, BackGroundColor);
-  M5.Lcd.println("Starting wifi");
+    M5.Lcd.fillScreen(BackGroundColor);
+    M5.Lcd.setCursor(0,4);
+    M5.Lcd.setTextSize(2);
+    M5.Lcd.setTextColor(WHITE, BackGroundColor);
+    M5.Lcd.println("Starting wifi");
 #endif
 
   WiFi.setHostname(HOSTNAME);
@@ -167,6 +164,7 @@ void SetupMutiWifi()
 /** START - OAT Code **/
 void SetupOTAFunctions()
 {  
+  BackGroundColor = TFT_BLUE;
   // Start of OTA section
 
   Serial.println("OTA Setup Starting");
@@ -393,10 +391,8 @@ void SetupOTAFunctions()
 #endif
 
   delay(STARTUPMSGDELAY);    // delay so that no issues with ezM5 library occurs
-
-#if defined M5CORE || defined M5StickC
+  
   M5.Lcd.fillScreen(TFT_BLACK);   //Clear the screen
-#endif
 
 }
 /** END - OAT Code **/

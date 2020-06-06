@@ -27,7 +27,7 @@ const char* Version = "V0.6";
 #define STARTUPSCREENBRIGHTNESS 200    // startup brightness
 #define M5StickC                       // define M5 type so WifiSupport.h knows how to display LCD messages
 //#define M5CORE                        // define M5 type so WifiSupport.h knows how to display LCD messages
-//const char* M5TYPE = "M5StickC";       //Define M5 unit
+
 int StdScreenBrightness = 100;
 int BackGroundColor = BLACK;
 int TextColor = WHITE;
