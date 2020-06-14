@@ -1,5 +1,6 @@
 void OutputBuildInfo()
 {
+  char Build[30];
   sprintf(Build, "%s %s", BuildTime, BuildDate );
   Serial.print(SKETCH);
   Serial.print(" ");

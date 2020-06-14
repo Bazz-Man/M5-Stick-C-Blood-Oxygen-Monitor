@@ -31,7 +31,6 @@ const char* Version = "V0.6";
 int StdScreenBrightness = 100;
 int BackGroundColor = BLACK;
 int TextColor = WHITE;
-char Build[30];
 int SecondsToInvalid = 30;          // Number of seconds before we say values are invalid
 time_t LastValidTime;              // Last time a valid reading was made 
 
